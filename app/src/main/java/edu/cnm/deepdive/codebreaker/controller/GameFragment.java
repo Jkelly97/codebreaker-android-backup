@@ -117,11 +117,6 @@ public class GameFragment extends Fragment implements InputFilter {
     });
     viewModel.getSolved().observe(lifecycleOwner, solved ->
         binding.guessControls.setVisibility(solved ? View.INVISIBLE : View.VISIBLE));
-    viewModel.getThrowable().observe(lifecycleOwner, (throwable) -> {
-      if (throwable != null) {
-        Toast.makeText(activity, throwable.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-      }
-    });
   }
 
   private void recordGuess() {
