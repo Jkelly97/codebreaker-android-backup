@@ -20,6 +20,12 @@
     app:layout_constraintEnd_toStartOf="@id/guess_list"
     app:layout_constraintHorizontal_weight="2">
 
+    <LinearLayout
+      android:id="@+id/spinners"
+      android:orientation="horizontal"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"/>
+
     <EditText
       android:id="@+id/guess"
       android:layout_width="match_parent"
