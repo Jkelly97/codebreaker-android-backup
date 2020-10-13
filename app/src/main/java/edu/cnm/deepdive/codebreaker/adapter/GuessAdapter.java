@@ -6,8 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import edu.cnm.deepdive.codebreaker.R;
@@ -18,20 +16,22 @@ import java.util.Map;
 
 public class GuessAdapter extends ArrayAdapter<Guess> {
 
-  private final Map<Character, Integer> colorMap;
+  private final Map<Character, Integer> colorValueMap;
+  private final Map<Character, String> colorLabelMap;
   private final LayoutInflater inflater;
 
-  public GuessAdapter(@NonNull Context context,
-      Map<Character, Integer> colorMap) {
+  public GuessAdapter(@NonNull Context context, Map<Character, Integer> colorValueMap,
+      Map<Character, String> colorLabelMap) {
     super(context, R.layout.item_guess, new ArrayList<Guess>());
     inflater = LayoutInflater.from(context);
-    this.colorMap = colorMap;
+    this.colorValueMap = colorValueMap;
+    this.colorLabelMap = colorLabelMap;
   }
 
   @NonNull
   @Override
   public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-    ItemGuessBinding binding= (convertView != null)
+    ItemGuessBinding binding = (convertView != null)
         ? ItemGuessBinding.bind(convertView)
         : ItemGuessBinding.inflate(inflater, parent, false);
     Guess guess = getItem(position);
@@ -43,8 +43,9 @@ public class GuessAdapter extends ArrayAdapter<Guess> {
     for (char c : guess.getText().toCharArray()) {
       ImageView swatch =
           (ImageView) inflater.inflate(R.layout.item_swatch, binding.guessContainer, false);
-      swatch.setBackgroundColor(colorMap.get(c));
-      swatch.setContentDescription(String.valueOf(c));
+      swatch.setBackgroundColor(colorValueMap.get(c));
+      swatch.setContentDescription(colorLabelMap.get(c));
+      swatch.setTooltipText(colorLabelMap.get(c));
       binding.guessContainer.addView(swatch);
     }
     return binding.getRoot();
