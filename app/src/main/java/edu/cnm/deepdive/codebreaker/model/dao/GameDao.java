@@ -42,8 +42,11 @@ public interface GameDao {
   Single<Integer> update(Collection<Game> games);
 
 
-  @Query(value = "SELECT * FROM Game ORDER BY code_length DESC")
+  @Query(value = "SELECT * FROM Game ORDER BY code_length DESC, guess_count ASC")
   LiveData<List<Game>> selectBest();
+
+  @Query("SELECT * FROM Game WHERE code_length = :codeLength ORDER BY guess_count ASC LIMIT :recordCount")
+  LiveData<List<Game>> selectBest(int codeLength, int recordCount);
 
 }
 
