@@ -12,7 +12,10 @@ import edu.cnm.deepdive.codebreaker.model.Code.Guess;
 import edu.cnm.deepdive.codebreaker.model.Game;
 import edu.cnm.deepdive.codebreaker.model.IllegalGuessCharacterException;
 import edu.cnm.deepdive.codebreaker.model.IllegalGuessLengthException;
+import edu.cnm.deepdive.codebreaker.service.GameRepository;
+import io.reactivex.functions.Consumer;
 import java.security.SecureRandom;
+import java.util.Date;
 import java.util.Random;
 
 public class MainViewModel extends AndroidViewModel {
@@ -27,9 +30,14 @@ public class MainViewModel extends AndroidViewModel {
   private final String codeLengthPrefKey;
   private final int codeLengthPrefDefault;
   private final SharedPreferences preferences;
+  private final GameRepository repository;
+
+  private Date timestamp;
+  private int previousGuessCount;
 
   public MainViewModel(@NonNull Application application) {
     super(application);
+    repository = new GameRepository(application);
     game = new MutableLiveData<>();
     guess = new MutableLiveData<>();
     solved = new MutableLiveData<>();
@@ -67,8 +75,10 @@ public class MainViewModel extends AndroidViewModel {
     throwable.setValue(null);
     guess.setValue(null);
     solved.setValue(false);
-    int codeLength = preferences.getInt(codeLengthPrefKey,codeLengthPrefDefault);
+    int codeLength = preferences.getInt(codeLengthPrefKey, codeLengthPrefDefault);
     Game game = new Game(POOL, codeLength, rng);
+    timestamp = new Date();
+    previousGuessCount = 0;
     this.game.setValue(game);
   }
 
@@ -76,9 +86,11 @@ public class MainViewModel extends AndroidViewModel {
     throwable.setValue(null);
     guess.setValue(null);
     solved.setValue(false);
+    Game game = this.game.getValue();
     //noinspection ConstantConditions
-    game.getValue().restart();
-    game.setValue(game.getValue());
+    previousGuessCount+= game.getGuessCount();
+    game.restart();
+    this.game.setValue(game);
   }
 
   public void guess(String text) {
@@ -89,10 +101,29 @@ public class MainViewModel extends AndroidViewModel {
       Guess guess = game.guess(text);
       this.guess.setValue(guess);
       this.game.setValue(game);
-      solved.setValue(guess.getCorrect() == game.getLength());
+      if (guess.getCorrect() == game.getLength()){
+        solved.setValue(true);
+        save(game);
+      }
+
     } catch (IllegalGuessLengthException | IllegalGuessCharacterException e) {
       throwable.setValue(e);
     }
+  }
+
+  private void save(Game game) {
+    edu.cnm.deepdive.codebreaker.model.entity.Game newGame =
+        new edu.cnm.deepdive.codebreaker.model.entity.Game();
+    newGame.setCodeLength(game.getLength());
+    newGame.setTimestamp(timestamp);
+    newGame.setGuessCount(game.getGuessCount() + previousGuessCount);
+    repository.save(newGame)
+        .subscribe(
+            () -> {
+            },
+            (throwable) -> this.throwable.postValue(throwable)
+        );
+
   }
 
 }
