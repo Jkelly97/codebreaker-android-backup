@@ -2,10 +2,10 @@
   <string name="app_name">Codebreaker</string>
   <string name="submit">Submit</string>
   <string name="guess_hint">Guess</string>
-  <string name="new_game">New game</string>
+  <string name="new_game">New score</string>
   <string name="new_game_condensed">New</string>
   <string name="results_of_guess">Results of guess</string>
-  <string name="restart_game">Restart game</string>
+  <string name="restart_game">Restart score</string>
   <string name="restart_game_condensed">Restart</string>
   <string name="title_activity_settings">Settings</string>
   <string name="settings">Settings</string>
